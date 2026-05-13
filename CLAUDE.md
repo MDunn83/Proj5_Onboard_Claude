@@ -1,6 +1,31 @@
-# New Hire Onboarding Workflow — Project Specification
+# CLAUDE.md
 
-## MANDATORY: Read n8n_SKILL.md and n8n_and_ClaudeCode_Lessons_Learned.md before doing anything else. Do not write any code or JSON until you confirm you have read both files.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Repository Purpose
+
+This repo produces a single n8n workflow JSON file (`new-hire-onboarding.json`) importable directly into n8n. There is no build system, no tests, and no dependencies — the output artifact is the JSON file itself.
+
+## Key Constraints
+
+- **GitHub MCP tools only.** All file pushes go through `mcp__github__push_files`. Do not run `git` commands locally or modify files on the local machine.
+- **Target branch:** `claude/new-hire-onboarding-workflow-cfqeZ` on `mdunn83/proj5_onboard_claude`.
+- The workflow JSON must be valid and importable into n8n without modification.
+
+## n8n JSON Structure Notes
+
+- Each node requires a unique `id` (UUID v4), a `name`, a `type`, and `typeVersion`.
+- Connections are declared separately in the top-level `"connections"` object, keyed by source node name.
+- Credentials are referenced by name (not ID) — use the exact credential names listed below.
+- The `"Wait"` node type is `n8n-nodes-base.wait`; set `resume: "timeInterval"` with `amount: 3` and `unit: "seconds"`.
+- Retry settings live inside each node's `"onError"` field: `{ "maxTries": 3, "waitBetweenTries": 2000 }` (n8n doubles on each retry for exponential backoff).
+- Google Sheets "append" uses operation `"append"` and "delete row" uses operation `"delete"` on `n8n-nodes-base.googleSheets`.
+- Google Tasks create uses `n8n-nodes-base.googleTasks` with `resource: "task"`, `operation: "create"`.
+- Groq calls use `n8n-nodes-base.openAi` node pointed at the Groq endpoint, or the dedicated `@n8n/n8n-nodes-langchain.lmChatGroq` node — prefer the latter when available.
+
+---
+
+# New Hire Onboarding Workflow — Project Specification
 
 ## Overview
 
