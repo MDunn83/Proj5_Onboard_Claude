@@ -1,5 +1,7 @@
 # New Hire Onboarding Workflow — Project Specification
 
+## MANDATORY: Read n8n_SKILL.md and n8n_and_ClaudeCode_Lessons_Learned.md before doing anything else. Do not write any code or JSON until you confirm you have read both files.
+
 ## Overview
 
 An n8n automation workflow that ingests new hire data from a Google Sheet, uses a Groq LLM to generate personalized onboarding content, sends HTML emails to the new hire and their manager, logs action items in Google Tasks, records the completed record in a Status Google Sheet, and removes the processed row from the input sheet.
