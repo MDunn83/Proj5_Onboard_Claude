@@ -1,5 +1,10 @@
 # CLAUDE.md
 
+## MANDATORY: Read n8n_SKILL.md before doing anything else.
+## MANDATORY: Read n8n_and_ClaudeCode_Lessons_Learned.md before doing anything else.
+## Do not build anything until you confirm you have read both files.
+## GitHub MCP only. Do not run any local git commands. Do not touch the local machine.
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Repository Purpose
