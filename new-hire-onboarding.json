@@ -1,0 +1,300 @@
+{
+  "name": "New Hire Onboarding",
+  "nodes": [
+    {
+      "id": "11111111-1111-4111-a111-111111111111",
+      "name": "Google Sheets Trigger",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [0, 300],
+      "parameters": {
+        "documentId": "YOUR_INPUT_SHEET_ID",
+        "sheetName": "Sheet1",
+        "event": "rowAdded",
+        "pollTimes": {
+          "item": [
+            {"mode": "everyMinute"}
+          ]
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "id": "22222222-2222-4222-a222-222222222222",
+      "name": "Normalize Fields",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\n  json: {\n    'First Name': $json['First Name'] || '',\n    'Last Name': $json['Last Name'] || '',\n    'Role': $json['Role'] || '',\n    'Department': $json['Department'] || '',\n    'Start Date': $json['Start Date'] || '',\n    'Manager': $json['Manager'] || '',\n    'Manager Email': $json['Manager Email'] || '',\n    'Contact Email': $json['Contact Email'] || '',\n    'Plan Tier': $json['Plan Tier'] || '',\n    'row_number': $json['row_number'] || $json['__n8n_rowNumber__'] || ''\n  }\n};"
+      }
+    },
+    {
+      "id": "33333333-3333-4333-a333-333333333333",
+      "name": "Chain: Welcome Message",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [440, 300],
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ 'You are an onboarding HR lead at a prestigious company that builds the most exquisite widgets in North America. Based on the following new hire data, personalize a 3 to 5 sentence welcome email to the new hire. Keep the tone warm, professional, and encouraging.\\n\\nNew Hire Name: ' + $json['First Name'] + ' ' + $json['Last Name'] + '\\nRole: ' + $json['Role'] + '\\nDepartment: ' + $json['Department'] + '\\nStart Date: ' + $json['Start Date'] + '\\nManager: ' + $json['Manager'] + '\\nPlan Tier: ' + $json['Plan Tier'] }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "44444444-4444-4444-a444-444444444444",
+      "name": "Groq Model 1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [440, 500],
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "credentials": {
+        "groqApi": {
+          "id": "REPLACE_GROQ_CREDENTIAL_ID",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "id": "55555555-5555-4555-a555-555555555555",
+      "name": "Save Welcome",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 300],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "let welcome_message = ($json.text || '').trim();\nwelcome_message = welcome_message.replace(/\\\\n/g, '\\n');\nreturn {\n  json: {\n    'First Name': $json['First Name'],\n    'Last Name': $json['Last Name'],\n    'Role': $json['Role'],\n    'Department': $json['Department'],\n    'Start Date': $json['Start Date'],\n    'Manager': $json['Manager'],\n    'Manager Email': $json['Manager Email'],\n    'Contact Email': $json['Contact Email'],\n    'Plan Tier': $json['Plan Tier'],\n    'row_number': $json['row_number'],\n    'welcome_message': welcome_message\n  }\n};"
+      }
+    },
+    {
+      "id": "66666666-6666-4666-a666-666666666666",
+      "name": "Wait 1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [880, 300],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 3,
+        "unit": "seconds"
+      }
+    },
+    {
+      "id": "77777777-7777-4777-a777-777777777777",
+      "name": "Chain: 30/60/90 Plan",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [1100, 300],
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ 'You are an onboarding HR lead at a prestigious company that builds the most exquisite widgets in North America. Generate a personalized 30/60/90 day onboarding plan for the following new hire. Each phase (30, 60, and 90 days) should be 2 to 3 sentences and tailored specifically to their role and department.\\n\\nNew Hire Name: ' + $json['First Name'] + ' ' + $json['Last Name'] + '\\nRole: ' + $json['Role'] + '\\nDepartment: ' + $json['Department'] + '\\nStart Date: ' + $json['Start Date'] + '\\nManager: ' + $json['Manager'] + '\\nPlan Tier: ' + $json['Plan Tier'] + '\\n\\nFormat your response as:\\n30 Days: [text]\\n60 Days: [text]\\n90 Days: [text]' }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "88888888-8888-4888-a888-888888888888",
+      "name": "Groq Model 2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [1100, 500],
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "credentials": {
+        "groqApi": {
+          "id": "REPLACE_GROQ_CREDENTIAL_ID",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "id": "99999999-9999-4999-a999-999999999999",
+      "name": "Save Plan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 300],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "let plan_3060_90 = ($json.text || '').trim();\nplan_3060_90 = plan_3060_90.replace(/\\\\n/g, '\\n');\nreturn {\n  json: {\n    'First Name': $json['First Name'],\n    'Last Name': $json['Last Name'],\n    'Role': $json['Role'],\n    'Department': $json['Department'],\n    'Start Date': $json['Start Date'],\n    'Manager': $json['Manager'],\n    'Manager Email': $json['Manager Email'],\n    'Contact Email': $json['Contact Email'],\n    'Plan Tier': $json['Plan Tier'],\n    'row_number': $json['row_number'],\n    'welcome_message': $json['welcome_message'],\n    'plan_3060_90': plan_3060_90\n  }\n};"
+      }
+    },
+    {
+      "id": "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa",
+      "name": "Wait 2",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [1540, 300],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 3,
+        "unit": "seconds"
+      }
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-abbb-bbbbbbbbbbbb",
+      "name": "Chain: Action Items",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [1760, 300],
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ 'Based on the following 30/60/90 day onboarding plan for ' + $json['First Name'] + ' ' + $json['Last Name'] + ' (' + $json['Role'] + ', ' + $json['Department'] + '), generate 4 to 5 concise action items that the manager (' + $json['Manager'] + ') must complete to support the new hire onboarding. Each action item should reference the relevant phase (30, 60, or 90 days) and be specific and actionable.\\n\\nSeparate each action item with this exact text on its own line: ---\\n\\n30/60/90 Plan:\\n' + $json['plan_3060_90'] }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-accc-cccccccccccc",
+      "name": "Groq Model 3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [1760, 500],
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "credentials": {
+        "groqApi": {
+          "id": "REPLACE_GROQ_CREDENTIAL_ID",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "id": "dddddddd-dddd-4ddd-addd-dddddddddddd",
+      "name": "Save Actions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1980, 300],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "let raw = ($json.text || '').trim();\nraw = raw.replace(/\\\\n/g, '\\n');\nconst action_items = raw.split('---').map(item => item.trim()).filter(item => item.length > 0);\nreturn {\n  json: {\n    'First Name': $json['First Name'],\n    'Last Name': $json['Last Name'],\n    'Role': $json['Role'],\n    'Department': $json['Department'],\n    'Start Date': $json['Start Date'],\n    'Manager': $json['Manager'],\n    'Manager Email': $json['Manager Email'],\n    'Contact Email': $json['Contact Email'],\n    'Plan Tier': $json['Plan Tier'],\n    'row_number': $json['row_number'],\n    'welcome_message': $json['welcome_message'],\n    'plan_3060_90': $json['plan_3060_90'],\n    'action_items': action_items\n  }\n};"
+      }
+    },
+    {
+      "id": "eeeeeeee-eeee-4eee-aeee-eeeeeeeeeeee",
+      "name": "Wait 3",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [2200, 300],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 3,
+        "unit": "seconds"
+      }
+    },
+    {
+      "id": "ffffffff-ffff-4fff-afff-ffffffffffff",
+      "name": "Chain: 30-Day Agenda",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [2420, 300],
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ 'You are an onboarding HR lead at a prestigious company that builds the most exquisite widgets in North America. Based on the new hire information and their 30/60/90 day plan below, generate a concise 30-day onboarding agenda that the manager (' + $json['Manager'] + ') can use to guide ' + $json['First Name'] + ' ' + $json['Last Name'] + ' through their first month. Keep it practical and role-specific.\\n\\nNew Hire Name: ' + $json['First Name'] + ' ' + $json['Last Name'] + '\\nRole: ' + $json['Role'] + '\\nDepartment: ' + $json['Department'] + '\\nStart Date: ' + $json['Start Date'] + '\\nPlan Tier: ' + $json['Plan Tier'] + '\\n\\n30/60/90 Plan:\\n' + $json['plan_3060_90'] }}"
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "12345678-1234-4234-a234-123456789012",
+      "name": "Groq Model 4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [2420, 500],
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "credentials": {
+        "groqApi": {
+          "id": "REPLACE_GROQ_CREDENTIAL_ID",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "id": "23456789-2345-4345-a345-234567890123",
+      "name": "Save Agenda",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2640, 300],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "let agenda_30day = ($json.text || '').trim();\nagenda_30day = agenda_30day.replace(/\\\\n/g, '\\n');\nreturn {\n  json: {\n    'First Name': $json['First Name'],\n    'Last Name': $json['Last Name'],\n    'Role': $json['Role'],\n    'Department': $json['Department'],\n    'Start Date': $json['Start Date'],\n    'Manager': $json['Manager'],\n    'Manager Email': $json['Manager Email'],\n    'Contact Email': $json['Contact Email'],\n    'Plan Tier': $json['Plan Tier'],\n    'row_number': $json['row_number'],\n    'welcome_message': $json['welcome_message'],\n    'plan_3060_90': $json['plan_3060_90'],\n    'action_items': $json['action_items'],\n    'agenda_30day': agenda_30day\n  }\n};"
+      }
+    }
+  ],
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [[{"node": "Normalize Fields", "type": "main", "index": 0}]]
+    },
+    "Normalize Fields": {
+      "main": [[{"node": "Chain: Welcome Message", "type": "main", "index": 0}]]
+    },
+    "Groq Model 1": {
+      "ai_languageModel": [[{"node": "Chain: Welcome Message", "type": "ai_languageModel", "index": 0}]]
+    },
+    "Chain: Welcome Message": {
+      "main": [[{"node": "Save Welcome", "type": "main", "index": 0}]]
+    },
+    "Save Welcome": {
+      "main": [[{"node": "Wait 1", "type": "main", "index": 0}]]
+    },
+    "Wait 1": {
+      "main": [[{"node": "Chain: 30/60/90 Plan", "type": "main", "index": 0}]]
+    },
+    "Groq Model 2": {
+      "ai_languageModel": [[{"node": "Chain: 30/60/90 Plan", "type": "ai_languageModel", "index": 0}]]
+    },
+    "Chain: 30/60/90 Plan": {
+      "main": [[{"node": "Save Plan", "type": "main", "index": 0}]]
+    },
+    "Save Plan": {
+      "main": [[{"node": "Wait 2", "type": "main", "index": 0}]]
+    },
+    "Wait 2": {
+      "main": [[{"node": "Chain: Action Items", "type": "main", "index": 0}]]
+    },
+    "Groq Model 3": {
+      "ai_languageModel": [[{"node": "Chain: Action Items", "type": "ai_languageModel", "index": 0}]]
+    },
+    "Chain: Action Items": {
+      "main": [[{"node": "Save Actions", "type": "main", "index": 0}]]
+    },
+    "Save Actions": {
+      "main": [[{"node": "Wait 3", "type": "main", "index": 0}]]
+    },
+    "Wait 3": {
+      "main": [[{"node": "Chain: 30-Day Agenda", "type": "main", "index": 0}]]
+    },
+    "Groq Model 4": {
+      "ai_languageModel": [[{"node": "Chain: 30-Day Agenda", "type": "ai_languageModel", "index": 0}]]
+    },
+    "Chain: 30-Day Agenda": {
+      "main": [[{"node": "Save Agenda", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
