@@ -238,6 +238,58 @@
         "mode": "runOnceForEachItem",
         "jsCode": "let agenda_30day = ($json.text || '').trim();\nagenda_30day = agenda_30day.replace(/\\\\n/g, '\\n');\nreturn {\n  json: {\n    'First Name': $json['First Name'],\n    'Last Name': $json['Last Name'],\n    'Role': $json['Role'],\n    'Department': $json['Department'],\n    'Start Date': $json['Start Date'],\n    'Manager': $json['Manager'],\n    'Manager Email': $json['Manager Email'],\n    'Contact Email': $json['Contact Email'],\n    'Plan Tier': $json['Plan Tier'],\n    'row_number': $json['row_number'],\n    'welcome_message': $json['welcome_message'],\n    'plan_3060_90': $json['plan_3060_90'],\n    'action_items': $json['action_items'],\n    'agenda_30day': agenda_30day\n  }\n};"
       }
+    },
+    {
+      "id": "34567890-3456-4456-a456-345678901234",
+      "name": "Gmail: Welcome Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [2860, 160],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $json['Contact Email'] }}",
+        "subject": "={{ 'Welcome to the team, ' + $json['First Name'] + '!' }}",
+        "message": "={{ '<html><body><p>Dear ' + $json['First Name'] + ',</p><br>' + $json.welcome_message.replace(/\\n/g, '<br>') + '<br><br><h3>Your 30/60/90 Day Onboarding Plan</h3><br>' + $json.plan_3060_90.replace(/\\n/g, '<br>') + '</body></html>' }}",
+        "options": {
+          "isBodyHtml": true
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail OAuth2 API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "45678901-4567-4567-a567-456789012345",
+      "name": "Gmail: Manager Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [2860, 440],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $json['Manager Email'] }}",
+        "subject": "={{ 'New Hire Onboarding Plan — ' + $json['First Name'] + ' ' + $json['Last Name'] }}",
+        "message": "={{ '<html><body><h3>30-Day Onboarding Agenda for ' + $json['First Name'] + ' ' + $json['Last Name'] + '</h3><br>' + $json.agenda_30day.replace(/\\n/g, '<br>') + '<br><br><h3>Manager Action Items</h3><br>' + ($json.action_items || []).map((item, i) => (i+1) + '. ' + item).join('<br>') + '</body></html>' }}",
+        "options": {
+          "isBodyHtml": true
+        }
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail OAuth2 API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
     }
   ],
   "connections": {
@@ -288,6 +340,12 @@
     },
     "Chain: 30-Day Agenda": {
       "main": [[{"node": "Save Agenda", "type": "main", "index": 0}]]
+    },
+    "Save Agenda": {
+      "main": [[
+        {"node": "Gmail: Welcome Email", "type": "main", "index": 0},
+        {"node": "Gmail: Manager Email", "type": "main", "index": 0}
+      ]]
     }
   },
   "active": false,
