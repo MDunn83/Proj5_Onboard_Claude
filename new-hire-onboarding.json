@@ -12,9 +12,7 @@
         "sheetName": "Sheet1",
         "event": "rowAdded",
         "pollTimes": {
-          "item": [
-            {"mode": "everyMinute"}
-          ]
+          "item": [{"mode": "everyMinute"}]
         }
       },
       "credentials": {
@@ -244,16 +242,14 @@
       "name": "Gmail: Welcome Email",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [2860, 160],
+      "position": [2860, 140],
       "parameters": {
         "resource": "message",
         "operation": "send",
         "sendTo": "={{ $json['Contact Email'] }}",
         "subject": "={{ 'Welcome to the team, ' + $json['First Name'] + '!' }}",
         "message": "={{ '<html><body><p>Dear ' + $json['First Name'] + ',</p><br>' + $json.welcome_message.replace(/\\n/g, '<br>') + '<br><br><h3>Your 30/60/90 Day Onboarding Plan</h3><br>' + $json.plan_3060_90.replace(/\\n/g, '<br>') + '</body></html>' }}",
-        "options": {
-          "isBodyHtml": true
-        }
+        "options": {"isBodyHtml": true}
       },
       "credentials": {
         "gmailOAuth2": {
@@ -270,21 +266,188 @@
       "name": "Gmail: Manager Email",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [2860, 440],
+      "position": [2860, 460],
       "parameters": {
         "resource": "message",
         "operation": "send",
         "sendTo": "={{ $json['Manager Email'] }}",
         "subject": "={{ 'New Hire Onboarding Plan — ' + $json['First Name'] + ' ' + $json['Last Name'] }}",
         "message": "={{ '<html><body><h3>30-Day Onboarding Agenda for ' + $json['First Name'] + ' ' + $json['Last Name'] + '</h3><br>' + $json.agenda_30day.replace(/\\n/g, '<br>') + '<br><br><h3>Manager Action Items</h3><br>' + ($json.action_items || []).map((item, i) => (i+1) + '. ' + item).join('<br>') + '</body></html>' }}",
-        "options": {
-          "isBodyHtml": true
-        }
+        "options": {"isBodyHtml": true}
       },
       "credentials": {
         "gmailOAuth2": {
           "id": "REPLACE_GMAIL_CREDENTIAL_ID",
           "name": "Gmail OAuth2 API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "a1234567-a123-4123-a123-a12345678901",
+      "name": "Check_In",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2860, 300],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "let startDate = $json['Start Date'] || '';\nlet checkInDate = '';\ntry {\n  const start = new Date(startDate);\n  const checkIn = new Date(start);\n  checkIn.setDate(checkIn.getDate() + 30);\n  checkInDate = checkIn.toISOString().split('T')[0];\n} catch(e) {\n  checkInDate = '';\n}\nconst timestamp = new Date().toISOString();\nreturn {\n  json: {\n    'First Name': $json['First Name'],\n    'Last Name': $json['Last Name'],\n    'Role': $json['Role'],\n    'Department': $json['Department'],\n    'Start Date': $json['Start Date'],\n    'Manager': $json['Manager'],\n    'Contact Email': $json['Contact Email'],\n    'Plan Tier': $json['Plan Tier'],\n    'row_number': $json['row_number'],\n    'check_in_date': checkInDate,\n    'timestamp': timestamp\n  }\n};"
+      }
+    },
+    {
+      "id": "b2345678-b234-4234-b234-b23456789012",
+      "name": "Split Action Items",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [2860, 620],
+      "parameters": {
+        "fieldToSplitOut": "action_items",
+        "options": {
+          "include": "allOtherFields"
+        }
+      }
+    },
+    {
+      "id": "c3456789-c345-4345-c345-c34567890123",
+      "name": "Prep Task",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3080, 620],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const actionItem = ($json.action_items || '').trim();\nconst manager = $json['Manager'] || '';\nconst firstName = $json['First Name'] || '';\nconst lastName = $json['Last Name'] || '';\nconst role = $json['Role'] || '';\nconst startDate = $json['Start Date'] || '';\n\nlet dueDate = '';\nlet phase = '30';\ntry {\n  const start = new Date(startDate);\n  if (/90.day/i.test(actionItem)) {\n    phase = '90';\n    const d = new Date(start);\n    d.setDate(d.getDate() + 90);\n    dueDate = d.toISOString().split('T')[0];\n  } else if (/60.day/i.test(actionItem)) {\n    phase = '60';\n    const d = new Date(start);\n    d.setDate(d.getDate() + 60);\n    dueDate = d.toISOString().split('T')[0];\n  } else {\n    const d = new Date(start);\n    d.setDate(d.getDate() + 30);\n    dueDate = d.toISOString().split('T')[0];\n  }\n} catch(e) {\n  dueDate = '';\n}\n\nreturn {\n  json: {\n    task_title: manager + ' — ' + actionItem,\n    task_notes: 'New Hire: ' + firstName + ' ' + lastName + ' (' + role + '). Phase: ' + phase + ' days.',\n    due_date: dueDate\n  }\n};"
+      }
+    },
+    {
+      "id": "d4567890-d456-4456-d456-d45678901234",
+      "name": "Google Tasks: Create Task",
+      "type": "n8n-nodes-base.googleTasks",
+      "typeVersion": 1,
+      "position": [3300, 620],
+      "parameters": {
+        "resource": "task",
+        "operation": "create",
+        "taskList": {
+          "__rl": true,
+          "value": "YOUR_TASK_LIST_ID",
+          "mode": "id"
+        },
+        "title": "={{ $json.task_title }}",
+        "additionalFields": {
+          "notes": "={{ $json.task_notes }}",
+          "dueDate": "={{ $json.due_date }}"
+        }
+      },
+      "credentials": {
+        "googleTasksOAuth2Api": {
+          "id": "REPLACE_TASKS_CREDENTIAL_ID",
+          "name": "Google Tasks OAuth2 API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "e5678901-e567-4567-e567-e56789012345",
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [3520, 620],
+      "parameters": {
+        "maxItems": 1
+      }
+    },
+    {
+      "id": "f6789012-f678-4678-f678-f67890123456",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [3740, 300],
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "includeUnpaired": true
+        }
+      }
+    },
+    {
+      "id": "a7890123-a789-4789-a789-a78901234567",
+      "name": "Build Status Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3960, 300],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\n  json: {\n    'Timestamp': $json.timestamp || new Date().toISOString(),\n    'First Name': $json['First Name'],\n    'Last Name': $json['Last Name'],\n    'Role': $json['Role'],\n    'Department': $json['Department'],\n    'Start Date': $json['Start Date'],\n    'Manager': $json['Manager'],\n    'Contact Email': $json['Contact Email'],\n    'Welcome Email Sent': 'Yes',\n    'Manager Email Sent': 'Yes',\n    'Tasks Created': 'Yes',\n    'Scheduled Check-In Date': $json.check_in_date,\n    'Onboarding Status': 'Initiate',\n    'Plan Tier': $json['Plan Tier'],\n    'row_number': $json['row_number']\n  }\n};"
+      }
+    },
+    {
+      "id": "b8901234-b890-4890-b890-b89012345678",
+      "name": "Sheets: Append Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [4180, 300],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_STATUS_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2 API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "c9012345-c901-4901-c901-c90123456789",
+      "name": "Sheets: Delete New Hire Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [4400, 300],
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_INPUT_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "toDelete": {
+          "rows": [
+            {"rowNumber": "={{ $json['row_number'] }}"}
+          ]
+        }
+      },
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets OAuth2 API"
         }
       },
       "retryOnFail": true,
@@ -344,8 +507,40 @@
     "Save Agenda": {
       "main": [[
         {"node": "Gmail: Welcome Email", "type": "main", "index": 0},
-        {"node": "Gmail: Manager Email", "type": "main", "index": 0}
+        {"node": "Gmail: Manager Email", "type": "main", "index": 0},
+        {"node": "Check_In", "type": "main", "index": 0},
+        {"node": "Split Action Items", "type": "main", "index": 0}
       ]]
+    },
+    "Gmail: Welcome Email": {
+      "main": [[{"node": "Merge", "type": "main", "index": 0}]]
+    },
+    "Gmail: Manager Email": {
+      "main": [[{"node": "Merge", "type": "main", "index": 1}]]
+    },
+    "Check_In": {
+      "main": [[{"node": "Merge", "type": "main", "index": 3}]]
+    },
+    "Split Action Items": {
+      "main": [[{"node": "Prep Task", "type": "main", "index": 0}]]
+    },
+    "Prep Task": {
+      "main": [[{"node": "Google Tasks: Create Task", "type": "main", "index": 0}]]
+    },
+    "Google Tasks: Create Task": {
+      "main": [[{"node": "Limit", "type": "main", "index": 0}]]
+    },
+    "Limit": {
+      "main": [[{"node": "Merge", "type": "main", "index": 2}]]
+    },
+    "Merge": {
+      "main": [[{"node": "Build Status Row", "type": "main", "index": 0}]]
+    },
+    "Build Status Row": {
+      "main": [[{"node": "Sheets: Append Status", "type": "main", "index": 0}]]
+    },
+    "Sheets: Append Status": {
+      "main": [[{"node": "Sheets: Delete New Hire Row", "type": "main", "index": 0}]]
     }
   },
   "active": false,
