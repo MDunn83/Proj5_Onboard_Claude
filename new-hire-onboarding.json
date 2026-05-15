@@ -447,6 +447,7 @@
       "parameters": {
         "mode": "combine",
         "combineBy": "combineByPosition",
+        "numberInputs": 4,
         "options": {
           "includeUnpaired": true
         }
@@ -511,132 +512,20 @@
           },
           "matchingColumns": [],
           "schema": [
-            {
-              "id": "Timestamp",
-              "displayName": "Timestamp",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "First Name",
-              "displayName": "First Name",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Last Name",
-              "displayName": "Last Name",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Role",
-              "displayName": "Role",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Department",
-              "displayName": "Department",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Start Date",
-              "displayName": "Start Date",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Manager",
-              "displayName": "Manager",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Contact Email",
-              "displayName": "Contact Email",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Welcome Email Sent",
-              "displayName": "Welcome Email Sent",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Manager Email Sent",
-              "displayName": "Manager Email Sent",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Tasks Created",
-              "displayName": "Tasks Created",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Scheduled Check-In Date",
-              "displayName": "Scheduled Check-In Date",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Onboarding Status",
-              "displayName": "Onboarding Status",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Plan Tier",
-              "displayName": "Plan Tier",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            }
+            {"id": "Timestamp", "displayName": "Timestamp", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "First Name", "displayName": "First Name", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Last Name", "displayName": "Last Name", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Role", "displayName": "Role", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Department", "displayName": "Department", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Start Date", "displayName": "Start Date", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Manager", "displayName": "Manager", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Contact Email", "displayName": "Contact Email", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Welcome Email Sent", "displayName": "Welcome Email Sent", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Manager Email Sent", "displayName": "Manager Email Sent", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Tasks Created", "displayName": "Tasks Created", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Scheduled Check-In Date", "displayName": "Scheduled Check-In Date", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Onboarding Status", "displayName": "Onboarding Status", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Plan Tier", "displayName": "Plan Tier", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true}
           ],
           "attemptToConvertTypes": false,
           "convertFieldsToString": false
@@ -707,318 +596,33 @@
   ],
   "pinData": {},
   "connections": {
-    "Google Sheets Trigger": {
-      "main": [
-        [
-          {
-            "node": "Normalize Fields",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Normalize Fields": {
-      "main": [
-        [
-          {
-            "node": "Chain: Welcome Message",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Groq Model 1": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Chain: Welcome Message",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Chain: Welcome Message": {
-      "main": [
-        [
-          {
-            "node": "Save Welcome",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Save Welcome": {
-      "main": [
-        [
-          {
-            "node": "Wait 1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Wait 1": {
-      "main": [
-        [
-          {
-            "node": "Chain: 30/60/90 Plan",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Groq Model 2": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Chain: 30/60/90 Plan",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Chain: 30/60/90 Plan": {
-      "main": [
-        [
-          {
-            "node": "Save Plan",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Save Plan": {
-      "main": [
-        [
-          {
-            "node": "Wait 2",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Wait 2": {
-      "main": [
-        [
-          {
-            "node": "Chain: Action Items",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Groq Model 3": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Chain: Action Items",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Chain: Action Items": {
-      "main": [
-        [
-          {
-            "node": "Save Actions",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Save Actions": {
-      "main": [
-        [
-          {
-            "node": "Wait 3",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Wait 3": {
-      "main": [
-        [
-          {
-            "node": "Chain: 30-Day Agenda",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Groq Model 4": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Chain: 30-Day Agenda",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Chain: 30-Day Agenda": {
-      "main": [
-        [
-          {
-            "node": "Save Agenda",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Save Agenda": {
-      "main": [
-        [
-          {
-            "node": "Gmail: Welcome Email",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Gmail: Manager Email",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Check_In",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Split Action Items",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Gmail: Welcome Email": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Gmail: Manager Email": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "Check_In": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 3
-          }
-        ]
-      ]
-    },
-    "Split Action Items": {
-      "main": [
-        [
-          {
-            "node": "Prep Task",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Prep Task": {
-      "main": [
-        [
-          {
-            "node": "Google Tasks: Create Task",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Google Tasks: Create Task": {
-      "main": [
-        [
-          {
-            "node": "Limit",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Limit": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 2
-          }
-        ]
-      ]
-    },
-    "Merge": {
-      "main": [
-        [
-          {
-            "node": "Build Status Row",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Build Status Row": {
-      "main": [
-        [
-          {
-            "node": "Sheets: Append Status",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Sheets: Append Status": {
-      "main": [
-        [
-          {
-            "node": "Sheets: Delete New Hire Row",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
+    "Google Sheets Trigger": {"main": [[{"node": "Normalize Fields", "type": "main", "index": 0}]]},
+    "Normalize Fields": {"main": [[{"node": "Chain: Welcome Message", "type": "main", "index": 0}]]},
+    "Groq Model 1": {"ai_languageModel": [[{"node": "Chain: Welcome Message", "type": "ai_languageModel", "index": 0}]]},
+    "Chain: Welcome Message": {"main": [[{"node": "Save Welcome", "type": "main", "index": 0}]]},
+    "Save Welcome": {"main": [[{"node": "Wait 1", "type": "main", "index": 0}]]},
+    "Wait 1": {"main": [[{"node": "Chain: 30/60/90 Plan", "type": "main", "index": 0}]]},
+    "Groq Model 2": {"ai_languageModel": [[{"node": "Chain: 30/60/90 Plan", "type": "ai_languageModel", "index": 0}]]},
+    "Chain: 30/60/90 Plan": {"main": [[{"node": "Save Plan", "type": "main", "index": 0}]]},
+    "Save Plan": {"main": [[{"node": "Wait 2", "type": "main", "index": 0}]]},
+    "Wait 2": {"main": [[{"node": "Chain: Action Items", "type": "main", "index": 0}]]},
+    "Groq Model 3": {"ai_languageModel": [[{"node": "Chain: Action Items", "type": "ai_languageModel", "index": 0}]]},
+    "Chain: Action Items": {"main": [[{"node": "Save Actions", "type": "main", "index": 0}]]},
+    "Save Actions": {"main": [[{"node": "Wait 3", "type": "main", "index": 0}]]},
+    "Wait 3": {"main": [[{"node": "Chain: 30-Day Agenda", "type": "main", "index": 0}]]},
+    "Groq Model 4": {"ai_languageModel": [[{"node": "Chain: 30-Day Agenda", "type": "ai_languageModel", "index": 0}]]},
+    "Chain: 30-Day Agenda": {"main": [[{"node": "Save Agenda", "type": "main", "index": 0}]]},
+    "Save Agenda": {"main": [[{"node": "Gmail: Welcome Email", "type": "main", "index": 0}, {"node": "Gmail: Manager Email", "type": "main", "index": 0}, {"node": "Check_In", "type": "main", "index": 0}, {"node": "Split Action Items", "type": "main", "index": 0}]]},
+    "Gmail: Welcome Email": {"main": [[{"node": "Merge", "type": "main", "index": 0}]]},
+    "Gmail: Manager Email": {"main": [[{"node": "Merge", "type": "main", "index": 1}]]},
+    "Check_In": {"main": [[{"node": "Merge", "type": "main", "index": 3}]]},
+    "Split Action Items": {"main": [[{"node": "Prep Task", "type": "main", "index": 0}]]},
+    "Prep Task": {"main": [[{"node": "Google Tasks: Create Task", "type": "main", "index": 0}]]},
+    "Google Tasks: Create Task": {"main": [[{"node": "Limit", "type": "main", "index": 0}]]},
+    "Limit": {"main": [[{"node": "Merge", "type": "main", "index": 2}]]},
+    "Merge": {"main": [[{"node": "Build Status Row", "type": "main", "index": 0}]]},
+    "Build Status Row": {"main": [[{"node": "Sheets: Append Status", "type": "main", "index": 0}]]},
+    "Sheets: Append Status": {"main": [[{"node": "Sheets: Delete New Hire Row", "type": "main", "index": 0}]]}
   },
   "active": false,
   "settings": {
