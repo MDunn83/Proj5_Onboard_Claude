@@ -1,442 +1,474 @@
 {
-  "name": "New Hire Onboarding",
+  "name": "Proj5_Claude",
   "nodes": [
     {
-      "id": "11111111-1111-4111-a111-111111111111",
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1kMtNEs9ivv92YfgYs1C-q-b3frYte7hVV96DrZusDSg",
+          "mode": "list",
+          "cachedResultName": "Proj5 New Hires",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMtNEs9ivv92YfgYs1C-q-b3frYte7hVV96DrZusDSg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1520485023,
+          "mode": "list",
+          "cachedResultName": "NewHires_Claude",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMtNEs9ivv92YfgYs1C-q-b3frYte7hVV96DrZusDSg/edit#gid=1520485023"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "id": "b8d8b5fa-1444-4fc4-9632-49bd0925d0e6",
       "name": "Google Sheets Trigger",
       "type": "n8n-nodes-base.googleSheetsTrigger",
       "typeVersion": 1,
-      "position": [0, 300],
-      "parameters": {
-        "documentId": "YOUR_INPUT_SHEET_ID",
-        "sheetName": "Sheet1",
-        "event": "rowAdded",
-        "pollTimes": {
-          "item": [{"mode": "everyMinute"}]
-        }
-      },
+      "position": [-2240, 32],
       "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "REPLACE_SHEETS_CREDENTIAL_ID",
-          "name": "Google Sheets OAuth2 API"
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "B7nQJTu1japJOQMR",
+          "name": "Google Sheets Trigger OAuth2 API"
         }
       }
     },
     {
-      "id": "22222222-2222-4222-a222-222222222222",
-      "name": "Normalize Fields",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [220, 300],
       "parameters": {
         "mode": "runOnceForEachItem",
         "jsCode": "return {\n  json: {\n    'First Name': $json['First Name'] || '',\n    'Last Name': $json['Last Name'] || '',\n    'Role': $json['Role'] || '',\n    'Department': $json['Department'] || '',\n    'Start Date': $json['Start Date'] || '',\n    'Manager': $json['Manager'] || '',\n    'Manager Email': $json['Manager Email'] || '',\n    'Contact Email': $json['Contact Email'] || '',\n    'Plan Tier': $json['Plan Tier'] || '',\n    'row_number': $json['row_number'] || $json['__n8n_rowNumber__'] || ''\n  }\n};"
-      }
+      },
+      "id": "50418b74-6c16-47f8-acb8-c4a3fbc37e04",
+      "name": "Normalize Fields",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-2016, 32]
     },
     {
-      "id": "33333333-3333-4333-a333-333333333333",
-      "name": "Chain: Welcome Message",
-      "type": "@n8n/n8n-nodes-langchain.chainLlm",
-      "typeVersion": 1.4,
-      "position": [440, 300],
       "parameters": {
         "promptType": "define",
         "text": "={{ 'You are an onboarding HR lead at a prestigious company that builds the most exquisite widgets in North America. Based on the following new hire data, personalize a 3 to 5 sentence welcome email to the new hire. Keep the tone warm, professional, and encouraging.\\n\\nNew Hire Name: ' + $json['First Name'] + ' ' + $json['Last Name'] + '\\nRole: ' + $json['Role'] + '\\nDepartment: ' + $json['Department'] + '\\nStart Date: ' + $json['Start Date'] + '\\nManager: ' + $json['Manager'] + '\\nPlan Tier: ' + $json['Plan Tier'] }}"
       },
+      "id": "03b0598f-053e-4c36-bc1f-572618d745b4",
+      "name": "Chain: Welcome Message",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [-1792, 32],
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 2000
     },
     {
-      "id": "44444444-4444-4444-a444-444444444444",
-      "name": "Groq Model 1",
-      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
-      "typeVersion": 1,
-      "position": [440, 500],
       "parameters": {
         "model": "llama-3.3-70b-versatile",
         "options": {}
       },
+      "id": "24712468-8459-4e91-a3a8-c237349052da",
+      "name": "Groq Model 1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [-1792, 240],
       "credentials": {
         "groqApi": {
-          "id": "REPLACE_GROQ_CREDENTIAL_ID",
+          "id": "C8eUwA2gHdY3LiPH",
           "name": "Groq account"
         }
       }
     },
     {
-      "id": "55555555-5555-4555-a555-555555555555",
-      "name": "Save Welcome",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [660, 300],
       "parameters": {
         "mode": "runOnceForEachItem",
         "jsCode": "let welcome_message = ($json.text || '').trim();\nwelcome_message = welcome_message.replace(/\\\\n/g, '\\n');\nreturn {\n  json: {\n    'First Name': $json['First Name'],\n    'Last Name': $json['Last Name'],\n    'Role': $json['Role'],\n    'Department': $json['Department'],\n    'Start Date': $json['Start Date'],\n    'Manager': $json['Manager'],\n    'Manager Email': $json['Manager Email'],\n    'Contact Email': $json['Contact Email'],\n    'Plan Tier': $json['Plan Tier'],\n    'row_number': $json['row_number'],\n    'welcome_message': welcome_message\n  }\n};"
-      }
+      },
+      "id": "a5c78185-f171-46ee-a2ff-a783baa4e99b",
+      "name": "Save Welcome",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-1520, 32]
     },
     {
-      "id": "66666666-6666-4666-a666-666666666666",
+      "parameters": {
+        "amount": 3,
+        "unit": "seconds"
+      },
+      "id": "85c1f5f1-6051-400d-ba0b-b6f433d14b48",
       "name": "Wait 1",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1,
-      "position": [880, 300],
-      "parameters": {
-        "resume": "timeInterval",
-        "amount": 3,
-        "unit": "seconds"
-      }
+      "position": [-1360, 32],
+      "webhookId": "f7377c40-703e-4894-8af5-5446ff6ad610"
     },
     {
-      "id": "77777777-7777-4777-a777-777777777777",
-      "name": "Chain: 30/60/90 Plan",
-      "type": "@n8n/n8n-nodes-langchain.chainLlm",
-      "typeVersion": 1.4,
-      "position": [1100, 300],
       "parameters": {
         "promptType": "define",
         "text": "={{ 'You are an onboarding HR lead at a prestigious company that builds the most exquisite widgets in North America. Generate a personalized 30/60/90 day onboarding plan for the following new hire. Each phase (30, 60, and 90 days) should be 2 to 3 sentences and tailored specifically to their role and department.\\n\\nNew Hire Name: ' + $json['First Name'] + ' ' + $json['Last Name'] + '\\nRole: ' + $json['Role'] + '\\nDepartment: ' + $json['Department'] + '\\nStart Date: ' + $json['Start Date'] + '\\nManager: ' + $json['Manager'] + '\\nPlan Tier: ' + $json['Plan Tier'] + '\\n\\nFormat your response as:\\n30 Days: [text]\\n60 Days: [text]\\n90 Days: [text]' }}"
       },
+      "id": "ff2d7cfc-12f4-4f29-8c92-b3fde21fd6d7",
+      "name": "Chain: 30/60/90 Plan",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [-1136, 32],
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 2000
     },
     {
-      "id": "88888888-8888-4888-a888-888888888888",
-      "name": "Groq Model 2",
-      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
-      "typeVersion": 1,
-      "position": [1100, 500],
       "parameters": {
         "model": "llama-3.3-70b-versatile",
         "options": {}
       },
+      "id": "064e7c1c-644e-4a89-a278-5df8e5c65116",
+      "name": "Groq Model 2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [-1136, 240],
       "credentials": {
         "groqApi": {
-          "id": "REPLACE_GROQ_CREDENTIAL_ID",
+          "id": "C8eUwA2gHdY3LiPH",
           "name": "Groq account"
         }
       }
     },
     {
-      "id": "99999999-9999-4999-a999-999999999999",
-      "name": "Save Plan",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1320, 300],
       "parameters": {
         "mode": "runOnceForEachItem",
         "jsCode": "let plan_3060_90 = ($json.text || '').trim();\nplan_3060_90 = plan_3060_90.replace(/\\\\n/g, '\\n');\nreturn {\n  json: {\n    'First Name': $json['First Name'],\n    'Last Name': $json['Last Name'],\n    'Role': $json['Role'],\n    'Department': $json['Department'],\n    'Start Date': $json['Start Date'],\n    'Manager': $json['Manager'],\n    'Manager Email': $json['Manager Email'],\n    'Contact Email': $json['Contact Email'],\n    'Plan Tier': $json['Plan Tier'],\n    'row_number': $json['row_number'],\n    'welcome_message': $json['welcome_message'],\n    'plan_3060_90': plan_3060_90\n  }\n};"
-      }
+      },
+      "id": "337afbbf-bc30-4472-8533-aad558c4cb68",
+      "name": "Save Plan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-864, 32]
     },
     {
-      "id": "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa",
+      "parameters": {
+        "amount": 3,
+        "unit": "seconds"
+      },
+      "id": "2f97cf21-cde5-42ec-9c6a-b4b8929be718",
       "name": "Wait 2",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1,
-      "position": [1540, 300],
-      "parameters": {
-        "resume": "timeInterval",
-        "amount": 3,
-        "unit": "seconds"
-      }
+      "position": [-704, 32],
+      "webhookId": "8aabefb5-9b4e-4493-8ac4-291123f61fb0"
     },
     {
-      "id": "bbbbbbbb-bbbb-4bbb-abbb-bbbbbbbbbbbb",
-      "name": "Chain: Action Items",
-      "type": "@n8n/n8n-nodes-langchain.chainLlm",
-      "typeVersion": 1.4,
-      "position": [1760, 300],
       "parameters": {
         "promptType": "define",
         "text": "={{ 'Based on the following 30/60/90 day onboarding plan for ' + $json['First Name'] + ' ' + $json['Last Name'] + ' (' + $json['Role'] + ', ' + $json['Department'] + '), generate 4 to 5 concise action items that the manager (' + $json['Manager'] + ') must complete to support the new hire onboarding. Each action item should reference the relevant phase (30, 60, or 90 days) and be specific and actionable.\\n\\nSeparate each action item with this exact text on its own line: ---\\n\\n30/60/90 Plan:\\n' + $json['plan_3060_90'] }}"
       },
+      "id": "1e9f8e4f-90d7-40bd-8d4f-e5db2aae2924",
+      "name": "Chain: Action Items",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [-480, 32],
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 2000
     },
     {
-      "id": "cccccccc-cccc-4ccc-accc-cccccccccccc",
-      "name": "Groq Model 3",
-      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
-      "typeVersion": 1,
-      "position": [1760, 500],
       "parameters": {
         "model": "llama-3.3-70b-versatile",
         "options": {}
       },
+      "id": "7613c15a-12cb-41d1-994f-c5a119f1b57c",
+      "name": "Groq Model 3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [-480, 240],
       "credentials": {
         "groqApi": {
-          "id": "REPLACE_GROQ_CREDENTIAL_ID",
+          "id": "C8eUwA2gHdY3LiPH",
           "name": "Groq account"
         }
       }
     },
     {
-      "id": "dddddddd-dddd-4ddd-addd-dddddddddddd",
-      "name": "Save Actions",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1980, 300],
       "parameters": {
         "mode": "runOnceForEachItem",
         "jsCode": "let raw = ($json.text || '').trim();\nraw = raw.replace(/\\\\n/g, '\\n');\nconst action_items = raw.split('---').map(item => item.trim()).filter(item => item.length > 0);\nreturn {\n  json: {\n    'First Name': $json['First Name'],\n    'Last Name': $json['Last Name'],\n    'Role': $json['Role'],\n    'Department': $json['Department'],\n    'Start Date': $json['Start Date'],\n    'Manager': $json['Manager'],\n    'Manager Email': $json['Manager Email'],\n    'Contact Email': $json['Contact Email'],\n    'Plan Tier': $json['Plan Tier'],\n    'row_number': $json['row_number'],\n    'welcome_message': $json['welcome_message'],\n    'plan_3060_90': $json['plan_3060_90'],\n    'action_items': action_items\n  }\n};"
-      }
+      },
+      "id": "ef893e50-e206-4cb3-87b1-d54a7388b236",
+      "name": "Save Actions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-208, 32]
     },
     {
-      "id": "eeeeeeee-eeee-4eee-aeee-eeeeeeeeeeee",
+      "parameters": {
+        "amount": 3,
+        "unit": "seconds"
+      },
+      "id": "f93e9888-9e99-4d62-8de8-56e9e6650e8c",
       "name": "Wait 3",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1,
-      "position": [2200, 300],
-      "parameters": {
-        "resume": "timeInterval",
-        "amount": 3,
-        "unit": "seconds"
-      }
+      "position": [0, 32],
+      "webhookId": "54a005aa-3ae3-465d-a189-cb0df2b9e4df"
     },
     {
-      "id": "ffffffff-ffff-4fff-afff-ffffffffffff",
-      "name": "Chain: 30-Day Agenda",
-      "type": "@n8n/n8n-nodes-langchain.chainLlm",
-      "typeVersion": 1.4,
-      "position": [2420, 300],
       "parameters": {
         "promptType": "define",
         "text": "={{ 'You are an onboarding HR lead at a prestigious company that builds the most exquisite widgets in North America. Based on the new hire information and their 30/60/90 day plan below, generate a concise 30-day onboarding agenda that the manager (' + $json['Manager'] + ') can use to guide ' + $json['First Name'] + ' ' + $json['Last Name'] + ' through their first month. Keep it practical and role-specific.\\n\\nNew Hire Name: ' + $json['First Name'] + ' ' + $json['Last Name'] + '\\nRole: ' + $json['Role'] + '\\nDepartment: ' + $json['Department'] + '\\nStart Date: ' + $json['Start Date'] + '\\nPlan Tier: ' + $json['Plan Tier'] + '\\n\\n30/60/90 Plan:\\n' + $json['plan_3060_90'] }}"
       },
+      "id": "d356b890-b484-4834-901b-8d608d445fce",
+      "name": "Chain: 30-Day Agenda",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [192, 32],
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 2000
     },
     {
-      "id": "12345678-1234-4234-a234-123456789012",
-      "name": "Groq Model 4",
-      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
-      "typeVersion": 1,
-      "position": [2420, 500],
       "parameters": {
         "model": "llama-3.3-70b-versatile",
         "options": {}
       },
+      "id": "b9ba9f0f-3d67-4413-a0f3-3e194cb4894f",
+      "name": "Groq Model 4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [192, 240],
       "credentials": {
         "groqApi": {
-          "id": "REPLACE_GROQ_CREDENTIAL_ID",
+          "id": "C8eUwA2gHdY3LiPH",
           "name": "Groq account"
         }
       }
     },
     {
-      "id": "23456789-2345-4345-a345-234567890123",
-      "name": "Save Agenda",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [2640, 300],
       "parameters": {
         "mode": "runOnceForEachItem",
         "jsCode": "let agenda_30day = ($json.text || '').trim();\nagenda_30day = agenda_30day.replace(/\\\\n/g, '\\n');\nreturn {\n  json: {\n    'First Name': $json['First Name'],\n    'Last Name': $json['Last Name'],\n    'Role': $json['Role'],\n    'Department': $json['Department'],\n    'Start Date': $json['Start Date'],\n    'Manager': $json['Manager'],\n    'Manager Email': $json['Manager Email'],\n    'Contact Email': $json['Contact Email'],\n    'Plan Tier': $json['Plan Tier'],\n    'row_number': $json['row_number'],\n    'welcome_message': $json['welcome_message'],\n    'plan_3060_90': $json['plan_3060_90'],\n    'action_items': $json['action_items'],\n    'agenda_30day': agenda_30day\n  }\n};"
-      }
+      },
+      "id": "bd3fc35f-1dee-48a0-be2a-d15050b678fa",
+      "name": "Save Agenda",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [432, 32]
     },
     {
-      "id": "34567890-3456-4456-a456-345678901234",
+      "parameters": {
+        "sendTo": "={{ $json['Contact Email'] }}",
+        "subject": "={{ 'Welcome to the team, ' + $json['First Name'] + '!' }}",
+        "message": "={{ '<html><body><p>Dear ' + $json['First Name'] + ',</p><br>' + ($json.welcome_message || '').replace(/\\n/g, '<br>') + '<br><br><h3>Your 30/60/90 Day Onboarding Plan</h3><br>' + ($json.plan_3060_90 || '').replace(/\\n/g, '<br>') + '</body></html>' }}",
+        "options": {
+          "isBodyHtml": true
+        }
+      },
+      "id": "d6435c4c-efce-4da4-9007-9fdbd79a08ee",
       "name": "Gmail: Welcome Email",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [2860, 140],
-      "parameters": {
-        "resource": "message",
-        "operation": "send",
-        "sendTo": "={{ $json['Contact Email'] }}",
-        "subject": "={{ 'Welcome to the team, ' + $json['First Name'] + '!' }}",
-        "message": "={{ '<html><body><p>Dear ' + $json['First Name'] + ',</p><br>' + $json.welcome_message.replace(/\\n/g, '<br>') + '<br><br><h3>Your 30/60/90 Day Onboarding Plan</h3><br>' + $json.plan_3060_90.replace(/\\n/g, '<br>') + '</body></html>' }}",
-        "options": {"isBodyHtml": true}
-      },
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "REPLACE_GMAIL_CREDENTIAL_ID",
-          "name": "Gmail OAuth2 API"
-        }
-      },
+      "position": [624, -128],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 2000
+      "waitBetweenTries": 2000,
+      "webhookId": "81d3ccfd-e7c2-40f4-8c17-729891678c01",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "TQTzNj3VYYidR6BX",
+          "name": "Gmail OAuth2 API"
+        }
+      }
     },
     {
-      "id": "45678901-4567-4567-a567-456789012345",
+      "parameters": {
+        "sendTo": "={{ $json['Manager Email'] }}",
+        "subject": "={{ 'New Hire Onboarding Plan — ' + $json['First Name'] + ' ' + $json['Last Name'] }}",
+        "message": "={{ '<html><body><h3>30-Day Onboarding Agenda for ' + $json['First Name'] + ' ' + $json['Last Name'] + '</h3><br>' + ($json.agenda_30day || '').replace(/\\n/g, '<br>') + '<br><br><h3>Manager Action Items</h3><br>' + ($json.action_items || []).map((item, i) => (i+1) + '. ' + item).join('<br>') + '</body></html>' }}",
+        "options": {
+          "isBodyHtml": true
+        }
+      },
+      "id": "c294181f-637e-48fc-94ce-818905885ca6",
       "name": "Gmail: Manager Email",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2,
-      "position": [2860, 460],
-      "parameters": {
-        "resource": "message",
-        "operation": "send",
-        "sendTo": "={{ $json['Manager Email'] }}",
-        "subject": "={{ 'New Hire Onboarding Plan — ' + $json['First Name'] + ' ' + $json['Last Name'] }}",
-        "message": "={{ '<html><body><h3>30-Day Onboarding Agenda for ' + $json['First Name'] + ' ' + $json['Last Name'] + '</h3><br>' + $json.agenda_30day.replace(/\\n/g, '<br>') + '<br><br><h3>Manager Action Items</h3><br>' + ($json.action_items || []).map((item, i) => (i+1) + '. ' + item).join('<br>') + '</body></html>' }}",
-        "options": {"isBodyHtml": true}
-      },
-      "credentials": {
-        "gmailOAuth2": {
-          "id": "REPLACE_GMAIL_CREDENTIAL_ID",
-          "name": "Gmail OAuth2 API"
-        }
-      },
+      "position": [624, 192],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 2000
+      "waitBetweenTries": 2000,
+      "webhookId": "8ab26712-05d3-46ba-b886-328c219a77f3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "TQTzNj3VYYidR6BX",
+          "name": "Gmail OAuth2 API"
+        }
+      }
     },
     {
-      "id": "a1234567-a123-4123-a123-a12345678901",
-      "name": "Check_In",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [2860, 300],
       "parameters": {
         "mode": "runOnceForEachItem",
         "jsCode": "let startDate = $json['Start Date'] || '';\nlet checkInDate = '';\ntry {\n  const start = new Date(startDate);\n  const checkIn = new Date(start);\n  checkIn.setDate(checkIn.getDate() + 30);\n  checkInDate = checkIn.toISOString().split('T')[0];\n} catch(e) {\n  checkInDate = '';\n}\nconst timestamp = new Date().toISOString();\nreturn {\n  json: {\n    'First Name': $json['First Name'],\n    'Last Name': $json['Last Name'],\n    'Role': $json['Role'],\n    'Department': $json['Department'],\n    'Start Date': $json['Start Date'],\n    'Manager': $json['Manager'],\n    'Contact Email': $json['Contact Email'],\n    'Plan Tier': $json['Plan Tier'],\n    'row_number': $json['row_number'],\n    'check_in_date': checkInDate,\n    'timestamp': timestamp\n  }\n};"
-      }
+      },
+      "id": "acee798e-40b4-445b-a8fb-c1925b2aa112",
+      "name": "Check_In",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [624, 32]
     },
     {
-      "id": "b2345678-b234-4234-b234-b23456789012",
+      "parameters": {
+        "fieldToSplitOut": "action_items",
+        "options": {}
+      },
+      "id": "fa83ed93-e41e-495b-b846-43c1ba939684",
       "name": "Split Action Items",
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
-      "position": [2860, 620],
-      "parameters": {
-        "fieldToSplitOut": "action_items",
-        "options": {
-          "include": "allOtherFields"
-        }
-      }
+      "position": [624, 352]
     },
     {
-      "id": "c3456789-c345-4345-c345-c34567890123",
-      "name": "Prep Task",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [3080, 620],
       "parameters": {
         "mode": "runOnceForEachItem",
         "jsCode": "const actionItem = ($json.action_items || '').trim();\nconst manager = $json['Manager'] || '';\nconst firstName = $json['First Name'] || '';\nconst lastName = $json['Last Name'] || '';\nconst role = $json['Role'] || '';\nconst startDate = $json['Start Date'] || '';\n\nlet dueDate = '';\nlet phase = '30';\ntry {\n  const start = new Date(startDate);\n  if (/90.day/i.test(actionItem)) {\n    phase = '90';\n    const d = new Date(start);\n    d.setDate(d.getDate() + 90);\n    dueDate = d.toISOString().split('T')[0];\n  } else if (/60.day/i.test(actionItem)) {\n    phase = '60';\n    const d = new Date(start);\n    d.setDate(d.getDate() + 60);\n    dueDate = d.toISOString().split('T')[0];\n  } else {\n    const d = new Date(start);\n    d.setDate(d.getDate() + 30);\n    dueDate = d.toISOString().split('T')[0];\n  }\n} catch(e) {\n  dueDate = '';\n}\n\nreturn {\n  json: {\n    task_title: manager + ' — ' + actionItem,\n    task_notes: 'New Hire: ' + firstName + ' ' + lastName + ' (' + role + '). Phase: ' + phase + ' days.',\n    due_date: dueDate\n  }\n};"
-      }
+      },
+      "id": "6c7a8662-fed0-4b86-8b4c-933b4fa0a9bd",
+      "name": "Prep Task",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [848, 352]
     },
     {
-      "id": "d4567890-d456-4456-d456-d45678901234",
+      "parameters": {
+        "task": "aUVrOU9idHRrVy1JWEE5Zg",
+        "title": "={{ $json.task_title }}",
+        "additionalFields": {
+          "dueDate": "={{ $json.due_date }}",
+          "notes": "={{ $json.task_notes }}"
+        }
+      },
+      "id": "d7ed8695-626d-47e6-85e5-b9acd1da653b",
       "name": "Google Tasks: Create Task",
       "type": "n8n-nodes-base.googleTasks",
       "typeVersion": 1,
-      "position": [3300, 620],
-      "parameters": {
-        "resource": "task",
-        "operation": "create",
-        "taskList": {
-          "__rl": true,
-          "value": "YOUR_TASK_LIST_ID",
-          "mode": "id"
-        },
-        "title": "={{ $json.task_title }}",
-        "additionalFields": {
-          "notes": "={{ $json.task_notes }}",
-          "dueDate": "={{ $json.due_date }}"
-        }
-      },
-      "credentials": {
-        "googleTasksOAuth2Api": {
-          "id": "REPLACE_TASKS_CREDENTIAL_ID",
-          "name": "Google Tasks OAuth2 API"
-        }
-      },
+      "position": [1072, 352],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 2000
-    },
-    {
-      "id": "e5678901-e567-4567-e567-e56789012345",
-      "name": "Limit",
-      "type": "n8n-nodes-base.limit",
-      "typeVersion": 1,
-      "position": [3520, 620],
-      "parameters": {
-        "maxItems": 1
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googleTasksOAuth2Api": {
+          "id": "DoLzJfoCz0RogB8s",
+          "name": "Google Tasks OAuth2 API"
+        }
       }
     },
     {
-      "id": "f6789012-f678-4678-f678-f67890123456",
-      "name": "Merge",
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3,
-      "position": [3740, 300],
+      "parameters": {
+        "maxItems": 1
+      },
+      "id": "46dd692a-d7f4-4032-8c53-3e3fa141d736",
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [1296, 352]
+    },
+    {
       "parameters": {
         "mode": "combine",
         "combineBy": "combineByPosition",
         "options": {
           "includeUnpaired": true
         }
-      }
+      },
+      "id": "fc38460d-0efd-4d90-bda4-0730d2fc7c6e",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [928, 32]
     },
     {
-      "id": "a7890123-a789-4789-a789-a78901234567",
-      "name": "Build Status Row",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [3960, 300],
       "parameters": {
         "mode": "runOnceForEachItem",
         "jsCode": "return {\n  json: {\n    'Timestamp': $json.timestamp || new Date().toISOString(),\n    'First Name': $json['First Name'],\n    'Last Name': $json['Last Name'],\n    'Role': $json['Role'],\n    'Department': $json['Department'],\n    'Start Date': $json['Start Date'],\n    'Manager': $json['Manager'],\n    'Contact Email': $json['Contact Email'],\n    'Welcome Email Sent': 'Yes',\n    'Manager Email Sent': 'Yes',\n    'Tasks Created': 'Yes',\n    'Scheduled Check-In Date': $json.check_in_date,\n    'Onboarding Status': 'Initiate',\n    'Plan Tier': $json['Plan Tier'],\n    'row_number': $json['row_number']\n  }\n};"
-      }
+      },
+      "id": "9ad0d7ee-cb2b-4878-88d4-76cd4bb30c56",
+      "name": "Build Status Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1152, 32]
     },
     {
-      "id": "b8901234-b890-4890-b890-b89012345678",
-      "name": "Sheets: Append Status",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4,
-      "position": [4180, 300],
       "parameters": {
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "YOUR_STATUS_SHEET_ID",
-          "mode": "id"
+          "value": "1kMtNEs9ivv92YfgYs1C-q-b3frYte7hVV96DrZusDSg",
+          "mode": "list",
+          "cachedResultName": "Proj5 New Hires",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMtNEs9ivv92YfgYs1C-q-b3frYte7hVV96DrZusDSg/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
-          "value": "Sheet1",
-          "mode": "name"
+          "value": 2066569802,
+          "mode": "list",
+          "cachedResultName": "Status_Claude",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMtNEs9ivv92YfgYs1C-q-b3frYte7hVV96DrZusDSg/edit#gid=2066569802"
         },
         "columns": {
-          "mappingMode": "autoMapInputData",
+          "mappingMode": "defineBelow",
           "value": {},
-          "matchingColumns": []
+          "matchingColumns": [],
+          "schema": [
+            {"id": "Timestamp", "displayName": "Timestamp", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "First Name", "displayName": "First Name", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Last Name", "displayName": "Last Name", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Contact Email", "displayName": "Contact Email", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Role", "displayName": "Role", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Department", "displayName": "Department", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Start Date", "displayName": "Start Date", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Manager", "displayName": "Manager", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Welcome Email Sent", "displayName": "Welcome Email Sent", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Manager Email Sent", "displayName": "Manager Email Sent", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Tasks Created", "displayName": "Tasks Created", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Scheduled Check-In Date", "displayName": "Scheduled Check-In Date", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Onboarding Status", "displayName": "Onboarding Status", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Plan Tier", "displayName": "Plan Tier", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true}
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
         },
         "options": {}
       },
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "REPLACE_SHEETS_CREDENTIAL_ID",
-          "name": "Google Sheets OAuth2 API"
-        }
-      },
-      "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000
-    },
-    {
-      "id": "c9012345-c901-4901-c901-c90123456789",
-      "name": "Sheets: Delete New Hire Row",
+      "id": "10f03c58-0a37-4572-9b11-22a12cd68421",
+      "name": "Sheets: Append Status",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4,
-      "position": [4400, 300],
+      "position": [1376, 32],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VlpWVU9OwNGPJWCp",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
       "parameters": {
         "operation": "delete",
         "documentId": {
           "__rl": true,
-          "value": "YOUR_INPUT_SHEET_ID",
-          "mode": "id"
+          "value": "1kMtNEs9ivv92YfgYs1C-q-b3frYte7hVV96DrZusDSg",
+          "mode": "list",
+          "cachedResultName": "Proj5 New Hires",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMtNEs9ivv92YfgYs1C-q-b3frYte7hVV96DrZusDSg/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
-          "value": "Sheet1",
-          "mode": "name"
+          "value": 1520485023,
+          "mode": "list",
+          "cachedResultName": "NewHires_Claude",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMtNEs9ivv92YfgYs1C-q-b3frYte7hVV96DrZusDSg/edit#gid=1520485023"
         },
         "toDelete": {
           "rows": [
@@ -444,17 +476,23 @@
           ]
         }
       },
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "REPLACE_SHEETS_CREDENTIAL_ID",
-          "name": "Google Sheets OAuth2 API"
-        }
-      },
+      "id": "6c646e22-8f39-4308-8caa-1fc394a116a6",
+      "name": "Sheets: Delete New Hire Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1600, 32],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 2000
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VlpWVU9OwNGPJWCp",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
     }
   ],
+  "pinData": {},
   "connections": {
     "Google Sheets Trigger": {
       "main": [[{"node": "Normalize Fields", "type": "main", "index": 0}]]
@@ -545,9 +583,14 @@
   },
   "active": false,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
+  "versionId": "ea2c876b-7b2a-427a-836d-4a0b04657ee1",
   "meta": {
-    "templateCredsSetupCompleted": true
-  }
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a69f34b4a7947f3628fc6742363ce98a03218a5fb133ca75fcec40a623997b24"
+  },
+  "id": "ypVs6HRdJkRmbwTC",
+  "tags": []
 }
